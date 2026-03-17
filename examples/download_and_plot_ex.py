@@ -1,43 +1,38 @@
 """
-Example: Download and plot suspension travel data from a Cass Logger recording.
+Example: Download data from a connected Cass Logger and plot internal IMU data.
 
-This script shows a simple example of how to load binary files
+This script demonstrates how to download binary files from a live device and
+visualize the on-board accelerometer channels.
 
 Workflow
 --------
-1. ``import_data`` — loads a pre-downloaded ``.bin`` file from the
-   ``examples/data/`` directory and parses it into a DataFrame using
-   ``CassCommands.process_data_file``.
-2. ``plot_data`` — applies the ADC-to-millimetre gain constants and
-   displays a two-panel time-series plot.
+1. ``download_data`` — connects to a Cass Logger over serial, downloads all
+   recorded ``.bin`` files via ``CassCommands.download_all()``, and returns
+   the path to the timestamped download directory.
+2. ``plot_internal_imu_data`` — iterates over every ``.bin`` file in that
+   directory, parses each one with ``CassCommands.process_data_file``, and
+   renders a three-panel time-series plot of the internal IMU axes.
+3. ``test_delete`` — lists files on the device, prompts the user for
+   confirmation, then deletes all files from the SD card.
 
 Data columns used
 -----------------
 - ``t``  : elapsed time in seconds (derived from the ``tmicros`` field)
-- ``a0`` : fork potentiometer raw ADC reading (scaled by ``FORK_GAIN``)
-- ``b0`` : shock potentiometer raw ADC reading (scaled by ``SHOCK_GAIN``)
-
-Constants
----------
-FORK_GAIN : float
-    Converts raw ``a0`` ADC counts to millimetres of fork travel.
-SHOCK_GAIN : float
-    Converts raw ``b0`` ADC counts to millimetres of shock travel.
+- ``gx`` : internal IMU X-axis acceleration [m/s²]
+- ``gy`` : internal IMU Y-axis acceleration [m/s²]
+- ``gz`` : internal IMU Z-axis acceleration [m/s²]
 
 Notes
 -----
-- The example ``.bin`` file must already exist in ``examples/data/``.
-  To download live data from a connected device use
-  ``CassCommands.download_all()`` instead.
-- ``process_data_file`` defaults to the ``"std"`` firmware dtype; pass
-  the ``fw_ver`` keyword if the file was recorded with an I2C firmware
-  variant.
+- A Cass Logger must be connected over USB/serial before running this script.
+- ``process_data_file`` defaults to the ``"std"`` firmware dtype; pass the
+  ``fw_ver`` keyword if the file was recorded with an I2C firmware variant.
 
 Usage
 -----
 Run directly::
 
-    python examples/download_and_process_example.py
+    python examples/download_and_plot_ex.py
 """
 
 import src.cass_commands as cass_commands

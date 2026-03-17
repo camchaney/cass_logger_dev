@@ -1,15 +1,16 @@
 """
-Example: Download and plot suspension travel data from a Cass Logger recording.
+Example: Load a pre-downloaded binary file and plot suspension potentiometer data.
 
-This script shows a simple example of how to load binary files
+This script shows a simple example of how to load a ``.bin`` file that already
+exists on disk and visualize the fork and shock potentiometer channels.
 
 Workflow
 --------
-1. ``import_data`` — loads a pre-downloaded ``.bin`` file from the
+1. ``import_data`` — loads the pre-bundled ``.bin`` file from the
    ``examples/data/`` directory and parses it into a DataFrame using
    ``CassCommands.process_data_file``.
-2. ``plot_data`` — applies the ADC-to-millimetre gain constants and
-   displays a two-panel time-series plot.
+2. ``plot_pot_data`` — applies the ADC-to-millimetre gain constants and
+   displays a two-panel time-series plot of fork and shock travel.
 
 Data columns used
 -----------------
@@ -26,18 +27,18 @@ SHOCK_GAIN : float
 
 Notes
 -----
-- The example ``.bin`` file must already exist in ``examples/data/``.
-  To download live data from a connected device use
-  ``CassCommands.download_all()`` instead.
-- ``process_data_file`` defaults to the ``"std"`` firmware dtype; pass
-  the ``fw_ver`` keyword if the file was recorded with an I2C firmware
-  variant.
+- No device connection is required; the example ``.bin`` file is bundled in
+  ``examples/data/``.
+- To download live data from a connected device use
+  ``CassCommands.download_all()`` (see ``download_and_plot_ex.py``).
+- ``process_data_file`` defaults to the ``"std"`` firmware dtype; pass the
+  ``fw_ver`` keyword if the file was recorded with an I2C firmware variant.
 
 Usage
 -----
 Run directly::
 
-    python examples/download_and_process_example.py
+    python examples/load_and_plot_ex.py
 """
 
 import src.cass_commands as cass_commands

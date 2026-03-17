@@ -15,10 +15,16 @@ Simple Python package for developers to interface with the Cass Logger. This pac
    ```bash
    pip install -r requirements.txt
 
-3. Explore usage examples in the python/ folder — you’ll find scripts you can run to interact with the logger and test functionality:
+3. Explore usage examples in the `examples/` folder — you’ll find scripts you can run to interact with the logger and test functionality:
+
+   | Script | Description |
+   |--------|-------------|
+   | `examples/load_and_plot_ex.py` | Load a pre-downloaded `.bin` file from `examples/data/` and plot potentiometer (fork/shock) data |
+   | `examples/download_and_plot_ex.py` | Download data from a connected device, then plot internal IMU (accelerometer) data |
 
    ```bash
-   python3 python/download_and_process_example.py
+   python3 examples/load_and_plot_ex.py
+   python3 examples/download_and_plot_ex.py
    ```
 
 ## 📋 Logger Operations
