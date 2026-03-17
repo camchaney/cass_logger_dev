@@ -5,7 +5,14 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "cass-logger-dev"
 version = "0.1.0"
+description = "Python package for interfacing with the Cass data logger"
 requires-python = ">=3.12"
+authors = [
+  { name = "Matt Morrison" }
+]
+
+[project.urls]
+Repository = "https://github.com/mcharlesmorrison/cass_logger_dev"
 
 [tool.setuptools.packages.find]
 where = ["."]
