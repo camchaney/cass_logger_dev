@@ -1,10 +1,12 @@
-import src.cass_comands as cass_comands
+"""Example: process a downloaded binary data file and plot potentiometer output."""
+
+import src.cass_commands as cass_commands
 from pathlib import Path
 from matplotlib import pyplot as plt
 
 
 def main():
-    cass_util = cass_comands.CassCommands()
+    cass_util = cass_commands.CassCommands()
     my_data = cass_util.process_data_file(
         str(Path.cwd()), "0a692d0e-2052-47f3-92c4-0571bded6ace.bin"
     )
