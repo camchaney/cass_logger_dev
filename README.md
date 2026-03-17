@@ -1,6 +1,6 @@
 # 🚀 cass_logger_dev 🚀
 
-Simple CLI for developers to interface with the Cass Logger. This package allows users to perform simple operations on the logger and download/process data.
+Simple Python package for developers to interface with the Cass Logger. This package allows users to perform simple operations on the logger and download/process data.
 
 ## 🛠️ How to Use
 
