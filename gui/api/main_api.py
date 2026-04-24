@@ -270,7 +270,7 @@ class MainApi:
 	def pick_file(self, file_types: tuple = ("All files (*.*)",)) -> dict:
 		try:
 			result = webview.windows[0].create_file_dialog(
-				webview.OPEN_DIALOG, file_types=file_types
+				webview.FileDialog.OPEN, file_types=file_types
 			)
 			return ok(result[0] if result else None)
 		except Exception as e:
@@ -278,7 +278,7 @@ class MainApi:
 
 	def pick_directory(self) -> dict:
 		try:
-			result = webview.windows[0].create_file_dialog(webview.FOLDER_DIALOG)
+			result = webview.windows[0].create_file_dialog(webview.FileDialog.FOLDER)
 			return ok(result[0] if result else None)
 		except Exception as e:
 			return err(str(e))
@@ -286,7 +286,7 @@ class MainApi:
 	def pick_save_file(self, file_types: tuple = ("CSV files (*.csv)",)) -> dict:
 		try:
 			result = webview.windows[0].create_file_dialog(
-				webview.SAVE_DIALOG, file_types=file_types
+				webview.FileDialog.SAVE, file_types=file_types
 			)
 			return ok(result if result else None)
 		except Exception as e:
