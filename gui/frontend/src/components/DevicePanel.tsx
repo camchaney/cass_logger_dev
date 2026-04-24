@@ -103,6 +103,7 @@ export default function DevicePanel({ status, onConnected }: Props) {
 									<th>Description</th>
 									<th>VID</th>
 									<th>PID</th>
+									<th></th>
 								</tr>
 							</thead>
 							<tbody>
@@ -112,6 +113,24 @@ export default function DevicePanel({ status, onConnected }: Props) {
 										<td>{p.description}</td>
 										<td className="mono">{p.vid ?? '—'}</td>
 										<td className="mono">{p.pid ?? '—'}</td>
+										<td>
+											<div className="row" style={{ gap: 4, flexWrap: 'nowrap' }}>
+												<button
+													className="btn btn-secondary"
+													style={{ padding: '3px 8px', fontSize: 11 }}
+													onClick={() => setDataPort(p.device)}
+												>
+													Data
+												</button>
+												<button
+													className="btn btn-secondary"
+													style={{ padding: '3px 8px', fontSize: 11 }}
+													onClick={() => setCmdPort(p.device)}
+												>
+													Cmd
+												</button>
+											</div>
+										</td>
 									</tr>
 								))}
 							</tbody>
