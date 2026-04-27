@@ -18,18 +18,18 @@ const CHART_COLORS = ['#3b82f6', '#22c55e', '#ef4444', '#f59e0b', '#8b5cf6']
 
 // IMU groups — all possible across firmware variants; filtered to what's in the data at render time
 const IMU_GROUPS = [
-	{ key: 'g',        label: 'G',         cols: ['gx',       'gy',       'gz'      ] },
-	{ key: 'w',        label: 'W',         cols: ['wx',       'wy',       'wz'      ] },
-	{ key: 't',        label: 'T',         cols: ['Tx',       'Ty',       'Tz'      ] },
-	{ key: 'g_i2c',   label: 'G (i2c)',   cols: ['gx_i2c',   'gy_i2c',   'gz_i2c'  ] },
-	{ key: 'w_i2c',   label: 'W (i2c)',   cols: ['wx_i2c',   'wy_i2c',   'wz_i2c'  ] },
-	{ key: 't_i2c',   label: 'T (i2c)',   cols: ['Tx_i2c',   'Ty_i2c',   'Tz_i2c'  ] },
-	{ key: 'g_i2c_c', label: 'G (i2c·c)', cols: ['gx_i2c_c', 'gy_i2c_c', 'gz_i2c_c'] },
-	{ key: 'w_i2c_c', label: 'W (i2c·c)', cols: ['wx_i2c_c', 'wy_i2c_c', 'wz_i2c_c'] },
-	{ key: 't_i2c_c', label: 'T (i2c·c)', cols: ['Tx_i2c_c', 'Ty_i2c_c', 'Tz_i2c_c'] },
-	{ key: 'g_i2c_e', label: 'G (i2c·e)', cols: ['gx_i2c_e', 'gy_i2c_e', 'gz_i2c_e'] },
-	{ key: 'w_i2c_e', label: 'W (i2c·e)', cols: ['wx_i2c_e', 'wy_i2c_e', 'wz_i2c_e'] },
-	{ key: 't_i2c_e', label: 'T (i2c·e)', cols: ['Tx_i2c_e', 'Ty_i2c_e', 'Tz_i2c_e'] },
+	{ key: 'g',        label: 'Accel',         cols: ['gx',       'gy',       'gz'      ] },
+	{ key: 'w',        label: 'Gyro',          cols: ['wx',       'wy',       'wz'      ] },
+	{ key: 't',        label: 'Mag',           cols: ['Tx',       'Ty',       'Tz'      ] },
+	{ key: 'g_i2c',   label: 'Accel (i2c)',   cols: ['gx_i2c',   'gy_i2c',   'gz_i2c'  ] },
+	{ key: 'w_i2c',   label: 'Gyro (i2c)',    cols: ['wx_i2c',   'wy_i2c',   'wz_i2c'  ] },
+	{ key: 't_i2c',   label: 'Mag (i2c)',     cols: ['Tx_i2c',   'Ty_i2c',   'Tz_i2c'  ] },
+	{ key: 'g_i2c_c', label: 'Accel (i2c·c)', cols: ['gx_i2c_c', 'gy_i2c_c', 'gz_i2c_c'] },
+	{ key: 'w_i2c_c', label: 'Gyro (i2c·c)',  cols: ['wx_i2c_c', 'wy_i2c_c', 'wz_i2c_c'] },
+	{ key: 't_i2c_c', label: 'Mag (i2c·c)',   cols: ['Tx_i2c_c', 'Ty_i2c_c', 'Tz_i2c_c'] },
+	{ key: 'g_i2c_e', label: 'Accel (i2c·e)', cols: ['gx_i2c_e', 'gy_i2c_e', 'gz_i2c_e'] },
+	{ key: 'w_i2c_e', label: 'Gyro (i2c·e)',  cols: ['wx_i2c_e', 'wy_i2c_e', 'wz_i2c_e'] },
+	{ key: 't_i2c_e', label: 'Mag (i2c·e)',   cols: ['Tx_i2c_e', 'Ty_i2c_e', 'Tz_i2c_e'] },
 ]
 
 const CHANNEL_LETTERS = ['a', 'b', 'c', 'd', 'e', 'f']
