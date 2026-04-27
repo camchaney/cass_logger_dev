@@ -17,7 +17,11 @@ export default function ConfigPanel({ connected, onRefresh }: Props) {
 	const api = window.pywebview?.api
 
 	const rtc = useMsg()
-	const [rtcVal, setRtcVal] = useState<string | null>(null)
+	const [rtcInfo, setRtcInfo] = useState<{
+		unix: number
+		datetime: string
+		driftSec: number
+	} | null>(null)
 
 	const devId = useMsg()
 	const [devIdVal, setDevIdVal] = useState<string | null>(null)
@@ -40,20 +44,36 @@ export default function ConfigPanel({ connected, onRefresh }: Props) {
 
 	// ── RTC ──────────────────────────────────────────────────────────────────
 
+	const driftMax = 3		// seconds
+
 	const getRtcTime = async () => {
 		if (!api) return
 		rtc.clear()
+		// Snapshot computer time as close to the device read as possible
+		const beforeMs = Date.now()
 		const res = await api.get_rtc_time()
-		if (res.ok) setRtcVal(res.data ?? null)
-		else rtc.set(false, res.error ?? 'Failed')
+		const afterMs = Date.now()
+		if (!res.ok || !res.data) { rtc.set(false, res.error ?? 'Failed'); return }
+
+		const deviceUnix = parseInt(res.data, 10)
+		// Mid-point of the round-trip as best estimate of "now" when device was read
+		const computerUnix = Math.round((beforeMs + afterMs) / 2 / 1000)
+		const driftSec = deviceUnix - computerUnix
+
+		setRtcInfo({
+			unix: deviceUnix,
+			datetime: new Date(deviceUnix * 1000).toUTCString(),
+			driftSec,
+		})
 	}
 
-	const setRtcTime = async () => {
+	const doSyncRtc = async () => {
 		if (!api) return
 		rtc.clear()
 		const res = await api.set_rtc_time()
 		if (res.ok) {
 			rtc.set(true, res.data ?? 'RTC synced')
+			setRtcInfo(null)
 			onRefresh()
 		} else {
 			rtc.set(false, res.error ?? 'Failed')
@@ -130,14 +150,36 @@ export default function ConfigPanel({ connected, onRefresh }: Props) {
 			<div className="card">
 				<div className="card-title">RTC Clock</div>
 				<div className="row" style={{ marginBottom: 8 }}>
-					<button className="btn btn-secondary" onClick={getRtcTime}>Get Current Time</button>
-					<button className="btn btn-primary" onClick={setRtcTime}>Sync to UTC Now</button>
+					<button className="btn btn-secondary" onClick={getRtcTime}>Read</button>
+					<button className="btn btn-primary" onClick={doSyncRtc}>Sync to UTC Now</button>
 				</div>
-				{rtcVal && (
-					<div className="alert alert-info" style={{ marginBottom: 8 }}>
-						Device RTC unix time: <strong className="mono">{rtcVal}</strong>
-					</div>
+
+				{rtcInfo && (
+					<>
+						<div className="alert alert-info" style={{ marginBottom: 8 }}>
+							<div style={{ marginBottom: 4 }}>
+								<span className="muted" style={{ fontSize: 12 }}>Device time </span>
+								<strong className="mono">{rtcInfo.datetime}</strong>
+							</div>
+							<div>
+								<span className="muted" style={{ fontSize: 12 }}>Unix </span>
+								<span className="mono">{rtcInfo.unix}</span>
+							</div>
+						</div>
+
+						{Math.abs(rtcInfo.driftSec) > driftMax && (
+							<div className="alert alert-warning" style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+								<span>
+									⚠ RTC is <strong>{Math.abs(rtcInfo.driftSec)}s {rtcInfo.driftSec > 0 ? 'ahead of' : 'behind'} computer time</strong> — sync recommended.
+								</span>
+								<button className="btn btn-primary" style={{ flexShrink: 0 }} onClick={doSyncRtc}>
+									Sync Now
+								</button>
+							</div>
+						)}
+					</>
 				)}
+
 				{rtc.msg && (
 					<div className={`alert ${rtc.msg.ok ? 'alert-success' : 'alert-error'}`}>
 						{rtc.msg.text}
