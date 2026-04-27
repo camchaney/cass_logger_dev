@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import InfoTip from './InfoTip'
 import {
 	CartesianGrid,
 	Line,
@@ -194,7 +195,10 @@ export default function DataPanel() {
 			{subTab === 'bin' && (
 				<>
 					<div className="card">
-						<div className="card-title">Load Binary File</div>
+						<div className="card-title">
+						Load Binary File
+						<InfoTip text="Select a raw .bin log file recorded by the device. The firmware version is detected automatically from the metadata file in the same folder — this is required to correctly decode the binary format." />
+					</div>
 						<div className="row" style={{ marginBottom: 12 }}>
 							<button className="btn btn-secondary" onClick={pickBin}>Choose .bin file</button>
 							{binPath && <span className="mono muted">{binPath.split(/[\\/]/).pop()}</span>}

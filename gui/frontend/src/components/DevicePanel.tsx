@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { DeviceStatus, PortInfo } from '../types'
+import InfoTip from './InfoTip'
 
 interface Props {
 	status: DeviceStatus
@@ -326,7 +327,10 @@ export default function DevicePanel({ status, onConnected }: Props) {
 
 					{/* RTC */}
 					<div className="card">
-						<div className="card-title">RTC Clock</div>
+						<div className="card-title">
+						RTC Clock
+						<InfoTip text="The device has a battery-backed real-time clock used to timestamp all logged data. Read the current time to check accuracy, then sync it to your computer's UTC time if it has drifted." />
+					</div>
 						<div className="row" style={{ marginBottom: 8 }}>
 							<button className="btn btn-secondary" onClick={getRtcTime}>Read</button>
 							<button className="btn btn-primary" onClick={doSyncRtc}>Sync to UTC Now</button>
@@ -365,7 +369,10 @@ export default function DevicePanel({ status, onConnected }: Props) {
 
 						{/* Battery install — grouped under RTC */}
 						<div style={{ borderTop: '1px solid var(--border)', marginTop: 12, paddingTop: 12 }}>
-							<div className="card-title">RTC Battery Install</div>
+							<div className="card-title">
+								RTC Battery Install
+								<InfoTip text="Records when the RTC coin battery was installed. The battery keeps the clock running when the device is unplugged. Replace it around the 10-month mark to avoid clock resets and incorrect timestamps." />
+							</div>
 							<div className="row" style={{ marginBottom: 8 }}>
 								<button className="btn btn-secondary" onClick={getRtcTs}>Read</button>
 								<button className="btn btn-primary" onClick={putRtcTs}>Set to Now</button>
