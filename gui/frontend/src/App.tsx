@@ -139,14 +139,15 @@ export default function App() {
 			</nav>
 
 			<main className="content">
-				{panel === 'device' && (
-					<DevicePanel
-						status={status}
-						onConnected={refreshStatus}
-					/>
-				)}
-				{panel === 'files' && <FilesPanel connected={status.connected} />}
-				{panel === 'data' && <DataPanel />}
+				<div style={{ display: panel === 'device' ? undefined : 'none' }}>
+					<DevicePanel status={status} onConnected={refreshStatus} />
+				</div>
+				<div style={{ display: panel === 'files' ? undefined : 'none' }}>
+					<FilesPanel connected={status.connected} />
+				</div>
+				<div style={{ display: panel === 'data' ? undefined : 'none' }}>
+					<DataPanel />
+				</div>
 			</main>
 		</div>
 	)
