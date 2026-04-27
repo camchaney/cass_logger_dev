@@ -6,6 +6,8 @@ interface Props {
 	onConnected: () => void
 }
 
+const isWindows = navigator.platform.startsWith('Win')
+
 export default function DevicePanel({ status, onConnected }: Props) {
 	const api = window.pywebview?.api
 
@@ -172,8 +174,11 @@ export default function DevicePanel({ status, onConnected }: Props) {
 			</div>
 
 			{/* Windows diagnostics */}
-			<div className="card">
-				<div className="card-title">Windows Diagnostics</div>
+			<div className="card" style={!isWindows ? { opacity: 0.45, pointerEvents: 'none' } : undefined}>
+				<div className="row" style={{ marginBottom: 8 }}>
+					<span className="card-title" style={{ margin: 0 }}>Windows Diagnostics</span>
+					{!isWindows && <span className="muted" style={{ fontSize: 12 }}>Windows only</span>}
+				</div>
 				<p className="muted" style={{ marginBottom: 12, fontSize: 13 }}>
 					Shows detailed COM port info to help identify the correct ports on Windows.
 				</p>
