@@ -52,6 +52,24 @@ export interface MetadataResult {
 	device_id: string | null
 }
 
+export interface UpdateState {
+	state: 'unknown' | 'up_to_date' | 'soft_update' | 'hard_update' | 'error'
+	installed_version: string
+	latest_version: string | null
+	minimum_version: string | null
+	changelog: string | null
+	error: string | null
+}
+
+export interface UpdateDownloadStatus {
+	status: 'running' | 'verifying' | 'done' | 'error'
+	progress: number
+	downloaded_bytes: number
+	total_bytes: number
+	installer_path: string | null
+	error: string | null
+}
+
 export interface WindowsPortDiag {
 	device: string
 	description: string
@@ -98,6 +116,13 @@ export interface PyApi {
 	pick_file(file_types?: string[]): Promise<ApiResult<string | null>>
 	pick_directory(): Promise<ApiResult<string | null>>
 	pick_save_file(file_types?: string[]): Promise<ApiResult<string | null>>
+	// Update
+	get_update_state(): Promise<ApiResult<UpdateState>>
+	start_update_download(): Promise<ApiResult<string>>
+	get_update_download_status(task_id: string): Promise<ApiResult<UpdateDownloadStatus>>
+	restart_and_install(task_id: string): Promise<ApiResult<string>>
+	dismiss_update(): Promise<ApiResult<null>>
+	skip_update_version(version: string): Promise<ApiResult<null>>
 	// Cloud
 	cloud_status(): Promise<ApiResult<{ available: boolean; message: string }>>
 }

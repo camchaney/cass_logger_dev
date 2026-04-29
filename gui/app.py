@@ -13,10 +13,12 @@ import webview
 
 from gui.api.main_api import MainApi
 from gui.services.cass_service import CassService
+from gui.services.update_service import UpdateService
 
 
 def main() -> None:
 	service = CassService()
+	UpdateService().start_check()
 	api = MainApi(service)
 
 	dev_mode = os.environ.get("DEV", "").lower() in ("1", "true", "yes")

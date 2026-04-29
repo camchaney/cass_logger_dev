@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { DeviceStatus } from './types'
+import type { DeviceStatus, UpdateState } from './types'
 import DataPanel from './components/DataPanel'
 import DevicePanel from './components/DevicePanel'
 import FilesPanel from './components/FilesPanel'
+import UpdateBanner from './components/UpdateBanner'
 
 type Panel = 'device' | 'files' | 'data'
 
@@ -20,7 +21,10 @@ export default function App() {
 	const [panel, setPanel] = useState<Panel>('device')
 	const [status, setStatus] = useState<DeviceStatus>({ connected: false })
 	const [connecting, setConnecting] = useState(false)
+	const [updateState, setUpdateState] = useState<UpdateState | null>(null)
+	const [updateDismissed, setUpdateDismissed] = useState(false)
 	const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
+	const updatePollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 	// Guards against concurrent connect attempts from overlapping poll ticks
 	const connectingRef = useRef(false)
 	// Set true after manual disconnect so polling doesn't immediately reconnect
@@ -48,14 +52,42 @@ export default function App() {
 		const onReady = () => {
 			refreshStatus()
 			pollRef.current = setInterval(refreshStatus, 5000)
+
+			// Poll update state until it resolves from 'unknown', then stop
+			const checkUpdate = async () => {
+				const api = window.pywebview?.api
+				if (!api) return
+				const res = await api.get_update_state()
+				if (!res.ok || !res.data) return
+				setUpdateState(res.data)
+				if (res.data.state !== 'unknown' && updatePollRef.current) {
+					clearInterval(updatePollRef.current)
+					updatePollRef.current = null
+				}
+			}
+			checkUpdate()
+			updatePollRef.current = setInterval(checkUpdate, 3000)
 		}
 		window.addEventListener('pywebviewready', onReady)
 		if (window.pywebview?.api) onReady()
 		return () => {
 			window.removeEventListener('pywebviewready', onReady)
 			if (pollRef.current) clearInterval(pollRef.current)
+			if (updatePollRef.current) clearInterval(updatePollRef.current)
 		}
 	}, [refreshStatus])
+
+	const handleDismissUpdate = useCallback(async () => {
+		const api = window.pywebview?.api
+		if (api) await api.dismiss_update()
+		setUpdateDismissed(true)
+	}, [])
+
+	const handleSkipUpdate = useCallback(async (version: string) => {
+		const api = window.pywebview?.api
+		if (api) await api.skip_update_version(version)
+		setUpdateDismissed(true)
+	}, [])
 
 	const handleConnect = async () => {
 		const api = getApi()
@@ -139,6 +171,14 @@ export default function App() {
 			</nav>
 
 			<main className="content">
+				{updateState && !updateDismissed &&
+					(updateState.state === 'soft_update' || updateState.state === 'hard_update') && (
+					<UpdateBanner
+						updateState={updateState}
+						onDismiss={handleDismissUpdate}
+						onSkip={handleSkipUpdate}
+					/>
+				)}
 				<div style={{ display: panel === 'device' ? undefined : 'none' }}>
 					<DevicePanel status={status} onConnected={refreshStatus} />
 				</div>

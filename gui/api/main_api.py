@@ -288,6 +288,37 @@ class MainApi:
 		except Exception as e:
 			return err(str(e))
 
+	# ── Update ─────────────────────────────────────────────────────────────────
+
+	def get_update_state(self) -> dict:
+		from gui.services.update_service import UpdateService
+		return ok(UpdateService().get_state())
+
+	def start_update_download(self) -> dict:
+		from gui.services.update_service import UpdateService
+		task_id = UpdateService().start_download()
+		return ok(task_id)
+
+	def get_update_download_status(self, task_id: str) -> dict:
+		from gui.services.update_service import UpdateService
+		status = UpdateService().get_download_status(task_id)
+		return ok(status) if status is not None else err("Unknown update task ID")
+
+	def restart_and_install(self, task_id: str) -> dict:
+		from gui.services.update_service import UpdateService
+		success = UpdateService().launch_and_quit(task_id)
+		return ok("Launching installer…") if success else err("Installer not ready.")
+
+	def dismiss_update(self) -> dict:
+		from gui.services.update_service import UpdateService
+		UpdateService().dismiss()
+		return ok(None)
+
+	def skip_update_version(self, version: str) -> dict:
+		from gui.services.update_service import UpdateService
+		UpdateService().skip_version(version)
+		return ok(None)
+
 	# ── Cloud (stub) ────────────────────────────────────────────────────────────
 
 	def cloud_status(self) -> dict:

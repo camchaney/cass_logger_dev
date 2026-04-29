@@ -1,0 +1,140 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest   # arm64
+            platform_key: darwin-arm64
+          - os: macos-13       # x86_64
+            platform_key: darwin-x86_64
+          - os: windows-latest
+            platform_key: win32-x64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install -r gui/requirements.txt
+
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build React frontend
+        working-directory: gui/frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Build with PyInstaller
+        run: pyinstaller CassLogger.spec --distpath gui/dist --workpath gui/build
+
+      # ── macOS: wrap .app in a DMG ──────────────────────────────────────────
+
+      - name: Create DMG (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install create-dmg
+          create-dmg \
+            --volname "CassLogger" \
+            --window-pos 200 120 \
+            --window-size 560 400 \
+            --icon-size 100 \
+            --icon "CassLogger.app" 140 185 \
+            --hide-extension "CassLogger.app" \
+            --app-drop-link 420 185 \
+            "gui/dist/CassLogger-${{ github.ref_name }}-${{ matrix.platform_key }}.dmg" \
+            "gui/dist/CassLogger.app"
+
+      # ── Windows: build Inno Setup installer ───────────────────────────────
+
+      - name: Build Inno Setup installer (Windows)
+        if: runner.os == 'Windows'
+        uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
+        with:
+          path: CassLogger.iss
+          options: /DAppVersion=${{ github.ref_name }} /O"gui/dist"
+
+      # ── Compute SHA-256 ────────────────────────────────────────────────────
+
+      - name: Compute SHA-256 (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          FILE="gui/dist/CassLogger-${{ github.ref_name }}-${{ matrix.platform_key }}.dmg"
+          shasum -a 256 "$FILE" | awk '{print $1}' > "$FILE.sha256"
+          echo "SHA256=$(cat "$FILE.sha256")" >> $GITHUB_ENV
+          echo "ASSET_PATH=$FILE" >> $GITHUB_ENV
+
+      - name: Compute SHA-256 (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $file = "gui\dist\CassLogger-${{ github.ref_name }}-win32-x64.exe"
+          $hash = (Get-FileHash $file -Algorithm SHA256).Hash.ToLower()
+          $hash | Out-File "$file.sha256" -NoNewline
+          echo "SHA256=$hash" >> $env:GITHUB_ENV
+          echo "ASSET_PATH=$file" >> $env:GITHUB_ENV
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.platform_key }}
+          path: |
+            gui/dist/CassLogger-*.dmg
+            gui/dist/CassLogger-*.exe
+          if-no-files-found: error
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Generate manifest.json
+        run: python scripts/generate_manifest.py
+        env:
+          TAG: ${{ github.ref_name }}
+          REPO: ${{ github.repository }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Cass Logger ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: |
+            artifacts/*
+            manifest.json
