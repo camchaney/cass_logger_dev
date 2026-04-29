@@ -9,6 +9,9 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
 	sys.path.insert(0, str(ROOT))
 
+# When frozen by PyInstaller, data files are unpacked into sys._MEIPASS.
+BUNDLE_DIR = Path(getattr(sys, "_MEIPASS", ROOT))
+
 import webview
 
 from gui.api.main_api import MainApi
@@ -27,7 +30,7 @@ def main() -> None:
 		# Vite dev server — hot reload available
 		url = "http://localhost:5173"
 	else:
-		dist = ROOT / "gui" / "frontend" / "dist" / "index.html"
+		dist = BUNDLE_DIR / "gui" / "frontend" / "dist" / "index.html"
 		url = dist.as_uri()
 
 	webview.create_window(
